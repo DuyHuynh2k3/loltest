@@ -24,6 +24,8 @@
         --advantage-bright: #7ddab0;
         --weakness: #cf5a49;
         --weakness-bright: #f0806c;
+        --caution: #d9a336;
+        --caution-bright: #f0c561;
 
         --text: #e9eef4;
         --text-dim: #8b9bad;
@@ -350,37 +352,6 @@
         height: 100%;
         object-fit: cover;
       }
-      .champ-card .net-chip {
-        position: absolute;
-        top: 7px;
-        right: 7px;
-        min-width: 20px;
-        height: 20px;
-        padding: 0 5px;
-        border-radius: 6px;
-        font-size: 10.5px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid;
-        backdrop-filter: blur(3px);
-      }
-      .champ-card .net-chip.up {
-        color: var(--advantage-bright);
-        background: rgba(79, 174, 134, 0.16);
-        border-color: rgba(79, 174, 134, 0.4);
-      }
-      .champ-card .net-chip.down {
-        color: var(--weakness-bright);
-        background: rgba(207, 90, 73, 0.16);
-        border-color: rgba(207, 90, 73, 0.4);
-      }
-      .champ-card .net-chip.even {
-        color: var(--text-dim);
-        background: rgba(255, 255, 255, 0.05);
-        border-color: var(--rule);
-      }
       .champ-card .name {
         padding: 10px 8px 3px;
         font-size: 13px;
@@ -568,7 +539,7 @@
         text-overflow: ellipsis;
       }
       .matchup-row .stars {
-        color: var(--brass);
+        color: var(--tier-color, var(--brass));
         font-size: 11px;
         letter-spacing: 1px;
         margin-top: 1px;
@@ -579,7 +550,10 @@
         height: 28px;
         border-radius: 50%;
         flex-shrink: 0;
-        background: conic-gradient(var(--brass) var(--pct), var(--rule) 0);
+        background: conic-gradient(
+          var(--tier-color, var(--brass)) var(--pct),
+          var(--rule) 0
+        );
         display: flex;
         align-items: center;
         justify-content: center;
@@ -594,7 +568,7 @@
         justify-content: center;
         font-size: 10.5px;
         font-weight: 700;
-        color: var(--brass-bright);
+        color: var(--tier-color, var(--brass-bright));
       }
 
       .add-matchup-btn {
@@ -1163,14 +1137,10 @@
       function championCardHtml(c) {
         const counters = champCounters(c.id).length;
         const countered = champCounteredBy(c.id).length;
-        const net = counters - countered;
-        const netClass = net > 0 ? "up" : net < 0 ? "down" : "even";
-        const netLabel = net > 0 ? `+${net}` : `${net}`;
         return `
     <div class="champ-card" onclick="openChampion('${c.id}')">
       <div class="card-top">
         <div class="img">${c.image ? `<img src="${c.image}" alt="">` : "Chưa có ảnh"}</div>
-        ${counters + countered > 0 ? `<div class="net-chip ${netClass}" title="Chênh lệch counter">${netLabel}</div>` : ""}
       </div>
       <div class="name">${escapeHtml(c.name)}</div>
       <div class="stats">
@@ -1206,7 +1176,7 @@
     <div class="matchup-layout">
       <div class="left">
         <div class="col-title weak-title"><span class="tick"></span>Bị counter bởi<span class="n">${counteredBy.length}</span></div>
-        ${counteredBy.map((m) => matchupRowHtml(m, findChamp(m.winnerId))).join("")}
+        ${counteredBy.map((m) => matchupRowHtml(m, findChamp(m.winnerId), "weak")).join("")}
         <button class="add-matchup-btn" onclick="openAddMatchup('${c.id}','COUNTERED_BY')">+ Thêm champion counter tôi</button>
       </div>
 
@@ -1233,7 +1203,7 @@
 
       <div class="right">
         <div class="col-title strong-title"><span class="tick"></span>Tôi counter<span class="n">${iCounter.length}</span></div>
-        ${iCounter.map((m) => matchupRowHtml(m, findChamp(m.loserId))).join("")}
+        ${iCounter.map((m) => matchupRowHtml(m, findChamp(m.loserId), "strong")).join("")}
         <button class="add-matchup-btn" onclick="openAddMatchup('${c.id}','I_COUNTER')">+ Thêm champion tôi counter</button>
       </div>
     </div>
@@ -1241,10 +1211,26 @@
       }
 
       /* opponent = the champion on the other side of this matchup row */
-      function matchupRowHtml(m, opponent) {
+      /* kind: "weak" = they counter me (higher strength = worse -> red),
+   "strong" = I counter them (higher strength = better -> green) */
+      function tierColorFor(strength, kind) {
+        if (kind === "weak") {
+          if (strength >= 5) return "var(--weakness-bright)";
+          if (strength === 4) return "var(--caution-bright)";
+          return "var(--advantage-bright)";
+        }
+        if (kind === "strong") {
+          if (strength >= 5) return "var(--advantage-bright)";
+          if (strength === 4) return "var(--caution-bright)";
+          return "var(--weakness-bright)";
+        }
+        return "var(--brass)";
+      }
+      function matchupRowHtml(m, opponent, kind) {
         if (!opponent) return "";
+        const color = tierColorFor(m.strength, kind);
         return `
-    <div class="matchup-row" onclick="openMatchupDetail('${m.id}')">
+    <div class="matchup-row" style="--tier-color:${color}" onclick="openMatchupDetail('${m.id}')">
       <div class="img">${opponent.image ? `<img src="${opponent.image}" alt="">` : ""}</div>
       <div class="row-info">
         <div class="name">${escapeHtml(opponent.name)}</div>
