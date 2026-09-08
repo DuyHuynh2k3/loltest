@@ -1,305 +1,888 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sổ Counter Cá Nhân</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;500;600;700&display=swap');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sổ Counter Cá Nhân</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
-  :root{
-    --bg: #0a1420;
-    --bg-panel: #0f1e2e;
-    --bg-panel-2: #142838;
-    --line: #24405a;
-    --gold: #c9a75c;
-    --gold-dim: #7d6a3f;
-    --teal: #3fc7b8;
-    --text: #dce6ee;
-    --text-dim: #7f96a8;
-    --danger: #c9584c;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
-  }
-  h1,h2,h3,.display{ font-family:'Marcellus',serif; font-weight:400; letter-spacing:.02em; }
+      :root {
+        --ink: #0a0e13;
+        --panel: #121821;
+        --panel-2: #171f2a;
+        --rule: #232e3a;
+        --rule-soft: #1a2430;
 
-  header{ padding:26px 32px 18px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:8px; }
-  header h1{ font-size:26px; margin:0; color:var(--gold); }
-  header .sub{ color:var(--text-dim); font-size:13px; margin-top:2px; }
-  #syncStatus{ font-size:12px; color:var(--text-dim); }
-  #syncStatus.saving{ color:var(--teal); }
-  #syncStatus.error{ color:var(--danger); }
+        --brass: #b98a52;
+        --brass-bright: #d9ac72;
+        --brass-dim: #6b5537;
 
-  nav.roles{ display:flex; gap:2px; padding:0 32px; border-bottom:1px solid var(--line); background:var(--bg-panel); overflow-x:auto; }
-  nav.roles button{
-    background:none; border:none; color:var(--text-dim); padding:14px 18px; cursor:pointer;
-    font-family:'Inter',sans-serif; font-size:14px; font-weight:600; border-bottom:2px solid transparent; white-space:nowrap;
-  }
-  nav.roles button.active{ color:var(--gold); border-bottom-color:var(--gold); }
-  nav.roles button:hover{ color:var(--text); }
+        --advantage: #5ba184;
+        --advantage-bright: #79c2a3;
+        --weakness: #c1604f;
+        --weakness-bright: #dd7b68;
 
-  main{ padding:28px 32px 60px; max-width:1100px; margin:0 auto; }
+        --text: #dfe6ec;
+        --text-dim: #889aa8;
+        --text-faint: #4d5c6a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--ink);
+        color: var(--text);
+        font-family: "Space Grotesk", sans-serif;
+        min-height: 100vh;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "Fraunces", serif;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
 
-  .toolbar{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
-  .search{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:3px;
-    padding:9px 12px; color:var(--text); font-size:13px; width:240px; font-family:'Inter',sans-serif;
-  }
-  .search::placeholder{ color:var(--text-dim); }
+      ::selection {
+        background: var(--brass-dim);
+        color: #fff;
+      }
 
-  .btn{
-    background:var(--gold); color:#0a1420; border:none; padding:9px 16px; border-radius:3px;
-    cursor:pointer; font-weight:600; font-size:13px; font-family:'Inter',sans-serif;
-  }
-  .btn:hover{ background:#dab868; }
-  .btn.secondary{ background:transparent; border:1px solid var(--line); color:var(--text); }
-  .btn.secondary:hover{ border-color:var(--gold); color:var(--gold); }
-  .btn.small{ padding:6px 12px; font-size:12px; }
-  .btn.danger{ background:transparent; border:1px solid var(--danger); color:var(--danger); }
-  .btn.danger:hover{ background:var(--danger); color:#0a1420; }
+      a,
+      button,
+      input,
+      textarea,
+      select,
+      .champ-card,
+      .matchup-row {
+        font-family: inherit;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible,
+      select:focus-visible,
+      [tabindex]:focus-visible {
+        outline: 2px solid var(--brass-bright);
+        outline-offset: 2px;
+      }
 
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:14px; }
-  .champ-card{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:4px; overflow:hidden; cursor:pointer;
-    transition:.15s; text-align:center;
-  }
-  .champ-card:hover{ border-color:var(--gold); transform:translateY(-2px); }
-  .champ-card .img{
-    width:100%; aspect-ratio:1; background:var(--bg-panel-2); display:flex; align-items:center; justify-content:center;
-    color:var(--text-dim); font-size:11px; overflow:hidden;
-  }
-  .champ-card .img img{ width:100%; height:100%; object-fit:cover; }
-  .champ-card .name{ padding:8px 6px; font-size:13px; font-weight:600; }
-  .champ-card .meta{ padding:0 6px 8px; font-size:11px; color:var(--text-dim); }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
 
-  .add-card{
-    background:none; border:1px dashed var(--line); border-radius:4px; aspect-ratio:0.78;
-    display:flex; align-items:center; justify-content:center; color:var(--text-dim); cursor:pointer; font-size:24px;
-  }
-  .add-card:hover{ border-color:var(--gold); color:var(--gold); }
+      /* ---------- header ---------- */
+      header {
+        padding: 30px 34px 20px;
+        border-bottom: 1px solid var(--rule);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        background: linear-gradient(
+          180deg,
+          rgba(185, 138, 82, 0.05),
+          transparent 70%
+        );
+      }
+      header h1 {
+        font-size: 27px;
+        color: var(--brass-bright);
+      }
+      header .sub {
+        color: var(--text-dim);
+        font-size: 13px;
+        margin-top: 5px;
+      }
+      #syncStatus {
+        font-size: 12px;
+        color: var(--text-faint);
+        letter-spacing: 0.02em;
+      }
+      #syncStatus.saving {
+        color: var(--brass-bright);
+      }
+      #syncStatus.error {
+        color: var(--weakness-bright);
+      }
 
-  .empty{ color:var(--text-dim); padding:40px 0; text-align:center; font-size:14px; }
+      /* ---------- role rail ---------- */
+      nav.roles {
+        display: flex;
+        gap: 4px;
+        padding: 0 34px;
+        border-bottom: 1px solid var(--rule);
+        background: var(--panel);
+        overflow-x: auto;
+      }
+      nav.roles button {
+        background: none;
+        border: none;
+        color: var(--text-faint);
+        padding: 15px 16px;
+        cursor: pointer;
+        font-size: 12.5px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      nav.roles button.active {
+        color: var(--brass-bright);
+        border-bottom-color: var(--brass);
+      }
+      nav.roles button:hover {
+        color: var(--text);
+      }
 
-  .back{ background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:13px; margin-bottom:20px; padding:0; }
-  .back:hover{ color:var(--gold); }
+      main {
+        padding: 30px 34px 70px;
+        max-width: 1120px;
+        margin: 0 auto;
+      }
 
-  .matchup-layout{ display:grid; grid-template-columns:1fr 1.15fr 1fr; gap:22px; align-items:start; }
-  @media(max-width:760px){
-    .matchup-layout{ grid-template-columns:1fr; }
-    .matchup-layout .center{ order:-1; margin-bottom:6px; }
-  }
+      /* ---------- toolbar / search ---------- */
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+      }
+      .search {
+        background: var(--panel);
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        padding: 10px 13px;
+        color: var(--text);
+        font-size: 13.5px;
+        width: 250px;
+        transition: border-color 0.15s;
+      }
+      .search:focus {
+        border-color: var(--brass);
+      }
+      .search::placeholder {
+        color: var(--text-faint);
+      }
 
-  .col-title{ font-size:12px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
-  .col-title span.n{ color:var(--gold); }
+      .btn {
+        background: var(--brass);
+        color: #0a0e13;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        transition: background 0.15s;
+      }
+      .btn:hover {
+        background: var(--brass-bright);
+      }
+      .btn.secondary {
+        background: transparent;
+        border: 1px solid var(--rule);
+        color: var(--text);
+      }
+      .btn.secondary:hover {
+        border-color: var(--brass);
+        color: var(--brass-bright);
+      }
+      .btn.small {
+        padding: 7px 13px;
+        font-size: 12px;
+      }
+      .btn.danger {
+        background: transparent;
+        border: 1px solid var(--weakness);
+        color: var(--weakness-bright);
+      }
+      .btn.danger:hover {
+        background: var(--weakness);
+        color: #0a0e13;
+      }
 
-  .matchup-row{
-    display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg-panel); border:1px solid var(--line);
-    border-radius:3px; margin-bottom:8px; cursor:pointer;
-  }
-  .matchup-row:hover{ border-color:var(--gold); }
-  .matchup-row .img{ width:36px; height:36px; border-radius:3px; overflow:hidden; background:var(--bg-panel-2); flex-shrink:0; display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-dim);}
-  .matchup-row .img img{ width:100%; height:100%; object-fit:cover; }
-  .matchup-row .name{ flex:1; font-size:14px; font-weight:500; }
-  .matchup-row .stars{ color:var(--gold); font-size:12px; letter-spacing:1px; }
+      /* ---------- roster grid ---------- */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+        gap: 15px;
+      }
+      .champ-card {
+        background: var(--panel);
+        border: 1px solid var(--rule-soft);
+        border-radius: 5px;
+        overflow: hidden;
+        cursor: pointer;
+        text-align: center;
+        transition:
+          border-color 0.15s,
+          transform 0.15s;
+      }
+      .champ-card:hover {
+        border-color: var(--brass-dim);
+        transform: translateY(-2px);
+      }
+      .champ-card .img {
+        width: 100%;
+        aspect-ratio: 1;
+        background: var(--panel-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-faint);
+        font-size: 11px;
+        overflow: hidden;
+      }
+      .champ-card .img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .champ-card .name {
+        padding: 10px 8px 4px;
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+      .champ-card .stats {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 8px 10px;
+      }
+      .champ-card .stat {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 9px;
+        line-height: 1.5;
+      }
+      .champ-card .stat.weak {
+        color: var(--weakness-bright);
+        background: rgba(193, 96, 79, 0.12);
+      }
+      .champ-card .stat.strong {
+        color: var(--advantage-bright);
+        background: rgba(91, 161, 132, 0.12);
+      }
 
-  .add-matchup-btn{
-    width:100%; padding:10px; background:none; border:1px dashed var(--line); color:var(--text-dim);
-    border-radius:3px; cursor:pointer; font-size:13px; margin-top:2px;
-  }
-  .add-matchup-btn:hover{ border-color:var(--gold); color:var(--gold); }
+      .add-card {
+        background: none;
+        border: 1px dashed var(--rule);
+        border-radius: 5px;
+        aspect-ratio: 0.8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-faint);
+        cursor: pointer;
+        font-size: 22px;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+      .add-card:hover {
+        border-color: var(--brass);
+        color: var(--brass-bright);
+      }
 
-  .center-card{
-    background:var(--bg-panel); border:1px solid var(--gold-dim); border-radius:5px; padding:22px 16px; text-align:center;
-    position:sticky; top:20px;
-  }
-  .center-card .img{
-    width:110px; height:110px; border-radius:5px; overflow:hidden; background:var(--bg-panel-2); border:1px solid var(--gold-dim);
-    margin:0 auto 12px; display:flex; align-items:center; justify-content:center; color:var(--text-dim); font-size:11px; cursor:pointer;
-  }
-  .center-card .img img{ width:100%; height:100%; object-fit:cover; }
-  .center-card .img:hover{ border-color:var(--gold); }
-  .center-card h2{ margin:0 0 4px; font-size:22px; }
-  .center-card .role-tag{ color:var(--teal); font-size:12px; letter-spacing:.05em; margin-bottom:16px; }
-  .center-card .actions{ display:flex; gap:8px; justify-content:center; }
+      .empty {
+        color: var(--text-faint);
+        padding: 44px 0;
+        text-align: center;
+        font-size: 14px;
+      }
 
-  .overlay{
-    position:fixed; inset:0; background:rgba(5,10,16,.7); display:flex; align-items:flex-start; justify-content:center;
-    padding:40px 16px; overflow-y:auto; z-index:50;
-  }
-  .modal{
-    background:var(--bg-panel); border:1px solid var(--gold-dim); border-radius:5px; width:100%; max-width:460px;
-    padding:26px; margin-bottom:40px;
-  }
-  .modal h3{ margin:0 0 18px; font-size:19px; color:var(--gold); }
-  .field{ margin-bottom:14px; }
-  .field label{ display:block; font-size:12px; color:var(--text-dim); margin-bottom:5px; text-transform:uppercase; letter-spacing:.05em; }
-  .field .hint{ font-size:11px; color:var(--text-dim); margin-top:4px; text-transform:none; letter-spacing:0; }
-  .field input[type=text], .field textarea, .field select{
-    width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text); padding:9px 10px;
-    border-radius:3px; font-family:'Inter',sans-serif; font-size:14px;
-  }
-  .field textarea{ resize:vertical; min-height:60px; }
-  .field .imgpick{ display:flex; gap:10px; align-items:center; }
-  .field .imgpick .prev{ width:48px; height:48px; border-radius:3px; background:var(--bg); border:1px solid var(--line); overflow:hidden; flex-shrink:0; display:flex;align-items:center;justify-content:center; }
-  .field .imgpick .prev img{ width:100%; height:100%; object-fit:cover; }
-  .field .imgpick input[type=file]{ font-size:12px; color:var(--text-dim); flex:1; }
+      .back {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        cursor: pointer;
+        font-size: 13px;
+        margin-bottom: 22px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.15s;
+      }
+      .back:hover {
+        color: var(--brass-bright);
+      }
 
-  .stars-pick{ display:flex; gap:6px; font-size:22px; }
-  .stars-pick span{ cursor:pointer; color:var(--line); }
-  .stars-pick span.on{ color:var(--gold); }
+      /* ---------- matchup layout ---------- */
+      .matchup-layout {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+      @media (max-width: 760px) {
+        .matchup-layout {
+          grid-template-columns: 1fr;
+        }
+        .matchup-layout .center {
+          order: -1;
+          margin-bottom: 8px;
+        }
+      }
 
-  .modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:20px; flex-wrap:wrap; }
+      .col-title {
+        font-size: 12.5px;
+        color: var(--text-dim);
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .col-title .tick {
+        width: 7px;
+        height: 7px;
+        border-radius: 1px;
+        flex-shrink: 0;
+      }
+      .col-title.weak-title .tick {
+        background: var(--weakness);
+      }
+      .col-title.strong-title .tick {
+        background: var(--advantage);
+      }
+      .col-title span.n {
+        color: var(--text-faint);
+        margin-left: auto;
+        font-size: 11.5px;
+      }
 
-  .mdetail{ display:flex; flex-direction:column; gap:16px; }
-  .mdetail .vs{ display:flex; align-items:center; justify-content:center; gap:18px; }
-  .mdetail .vs .side{ text-align:center; cursor:pointer; }
-  .mdetail .vs .img{ width:64px; height:64px; border-radius:4px; overflow:hidden; background:var(--bg-panel-2); margin:0 auto 6px; display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-dim);}
-  .mdetail .vs .img img{ width:100%; height:100%; object-fit:cover; }
-  .mdetail .vs .side:hover .img{ border:1px solid var(--gold); }
-  .mdetail .vs .arrow{ color:var(--teal); font-size:20px; }
-  .mdetail .stars-row{ text-align:center; color:var(--gold); font-size:18px; letter-spacing:2px; }
-  .mdetail .note-block{ background:var(--bg); border:1px solid var(--line); border-radius:3px; padding:14px; white-space:pre-wrap; font-size:14px; line-height:1.6; color:var(--text); min-height:40px; }
-  .mdetail .note-block:empty::before{ content:"(chưa có ghi chú)"; color:var(--text-dim); }
-</style>
-</head>
-<body>
+      .matchup-row {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 10px 11px;
+        background: var(--panel);
+        border: 1px solid var(--rule-soft);
+        border-radius: 4px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .matchup-row:hover {
+        border-color: var(--brass-dim);
+      }
+      .matchup-row .img {
+        width: 38px;
+        height: 38px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--panel-2);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        color: var(--text-faint);
+      }
+      .matchup-row .img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .matchup-row .name {
+        flex: 1;
+        font-size: 13.5px;
+        font-weight: 500;
+      }
+      .matchup-row .stars {
+        color: var(--brass);
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
 
-<header>
-  <div>
-    <h1>Sổ Counter Cá Nhân</h1>
-    <div class="sub">Champion pool &amp; matchup notes của riêng bạn</div>
-  </div>
-  <div id="syncStatus">Đang tải dữ liệu...</div>
-</header>
+      .add-matchup-btn {
+        width: 100%;
+        padding: 11px;
+        background: none;
+        border: 1px dashed var(--rule);
+        color: var(--text-faint);
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12.5px;
+        margin-top: 3px;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+      .add-matchup-btn:hover {
+        border-color: var(--brass);
+        color: var(--brass-bright);
+      }
 
-<nav class="roles" id="roleNav"></nav>
+      /* ---------- focus card (center) ---------- */
+      @keyframes focusIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .center-card {
+        background: var(--panel);
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 26px 18px;
+        text-align: center;
+        position: sticky;
+        top: 22px;
+        animation: focusIn 0.35s ease-out;
+      }
+      .portrait {
+        position: relative;
+        width: 116px;
+        height: 116px;
+        margin: 0 auto 16px;
+        cursor: pointer;
+      }
+      .portrait .frame {
+        width: 100%;
+        height: 100%;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--panel-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-faint);
+        font-size: 11px;
+      }
+      .portrait .frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .portrait .corner {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-color: var(--brass);
+        transition: border-color 0.15s;
+      }
+      .portrait .corner.tl {
+        top: -5px;
+        left: -5px;
+        border-top: 2px solid var(--brass);
+        border-left: 2px solid var(--brass);
+      }
+      .portrait .corner.tr {
+        top: -5px;
+        right: -5px;
+        border-top: 2px solid var(--brass);
+        border-right: 2px solid var(--brass);
+      }
+      .portrait .corner.bl {
+        bottom: -5px;
+        left: -5px;
+        border-bottom: 2px solid var(--brass);
+        border-left: 2px solid var(--brass);
+      }
+      .portrait .corner.br {
+        bottom: -5px;
+        right: -5px;
+        border-bottom: 2px solid var(--brass);
+        border-right: 2px solid var(--brass);
+      }
+      .portrait:hover .corner {
+        border-color: var(--brass-bright);
+      }
 
-<main id="main"></main>
+      .center-card h2 {
+        font-size: 24px;
+        margin-bottom: 4px;
+      }
+      .center-card .role-tag {
+        color: var(--text-dim);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        margin-bottom: 18px;
+      }
+      .center-card .actions {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
 
-<script>
-const ROLES = ["TOP","JUNGLE","MID","ADC","SUPPORT"];
-/* champion: {id,name,image,role}
+      /* ---------- modal ---------- */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(5, 8, 12, 0.72);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 40px 16px;
+        overflow-y: auto;
+        z-index: 50;
+      }
+      .modal {
+        background: var(--panel);
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        width: 100%;
+        max-width: 460px;
+        padding: 28px;
+        margin-bottom: 40px;
+      }
+      .modal h3 {
+        margin: 0 0 20px;
+        font-size: 19px;
+        color: var(--brass-bright);
+      }
+      .field {
+        margin-bottom: 15px;
+      }
+      .field label {
+        display: block;
+        font-size: 12.5px;
+        color: var(--text-dim);
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .field .hint {
+        font-size: 11.5px;
+        color: var(--text-faint);
+        margin-top: 5px;
+        line-height: 1.5;
+      }
+      .field input[type="text"],
+      .field textarea,
+      .field select {
+        width: 100%;
+        background: var(--ink);
+        border: 1px solid var(--rule);
+        color: var(--text);
+        padding: 10px 11px;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.15s;
+      }
+      .field input[type="text"]:focus,
+      .field textarea:focus,
+      .field select:focus {
+        border-color: var(--brass);
+      }
+      .field textarea {
+        resize: vertical;
+        min-height: 64px;
+      }
+      .field .imgpick {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .field .imgpick .prev {
+        width: 48px;
+        height: 48px;
+        border-radius: 4px;
+        background: var(--ink);
+        border: 1px solid var(--rule);
+        overflow: hidden;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .field .imgpick .prev img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .field .imgpick input[type="file"] {
+        font-size: 12px;
+        color: var(--text-dim);
+        flex: 1;
+      }
+
+      .stars-pick {
+        display: flex;
+        gap: 7px;
+        font-size: 23px;
+      }
+      .stars-pick span {
+        cursor: pointer;
+        color: var(--rule);
+        transition: color 0.1s;
+      }
+      .stars-pick span.on {
+        color: var(--brass);
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 22px;
+        flex-wrap: wrap;
+      }
+
+      .mdetail {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .mdetail .vs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+      }
+      .mdetail .vs .side {
+        text-align: center;
+        cursor: pointer;
+      }
+      .mdetail .vs .img {
+        width: 66px;
+        height: 66px;
+        border-radius: 5px;
+        overflow: hidden;
+        background: var(--panel-2);
+        margin: 0 auto 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: var(--text-faint);
+        border: 1px solid var(--rule-soft);
+        transition: border-color 0.15s;
+      }
+      .mdetail .vs .img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .mdetail .vs .side:hover .img {
+        border-color: var(--brass);
+      }
+      .mdetail .vs .arrow {
+        color: var(--advantage-bright);
+        font-size: 19px;
+      }
+      .mdetail .stars-row {
+        text-align: center;
+        color: var(--brass);
+        font-size: 18px;
+        letter-spacing: 2px;
+      }
+      .mdetail .note-block {
+        background: var(--ink);
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        padding: 15px;
+        white-space: pre-wrap;
+        font-size: 13.5px;
+        line-height: 1.65;
+        color: var(--text);
+        min-height: 42px;
+      }
+      .mdetail .note-block:empty::before {
+        content: "(chưa có ghi chú)";
+        color: var(--text-faint);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Sổ Counter Cá Nhân</h1>
+        <div class="sub">Champion pool &amp; matchup notes của riêng bạn</div>
+      </div>
+      <div id="syncStatus">Đang tải dữ liệu...</div>
+    </header>
+
+    <nav class="roles" id="roleNav"></nav>
+
+    <main id="main"></main>
+
+    <script>
+      const ROLES = ["TOP", "JUNGLE", "MID", "ADC", "SUPPORT"];
+      /* champion: {id,name,image,role}
    matchup:  {id, winnerId, loserId, strength, note}   -- winner counters loser */
-let state = { champions: [], matchups: [] };
+      let state = { champions: [], matchups: [] };
 
-let currentRole = "TOP";
-let currentChampId = null;
-let pendingImage = null;
+      let currentRole = "TOP";
+      let currentChampId = null;
+      let pendingImage = null;
 
-const uid = () => Math.random().toString(36).slice(2,10);
-const $ = sel => document.querySelector(sel);
+      const uid = () => Math.random().toString(36).slice(2, 10);
+      const $ = (sel) => document.querySelector(sel);
 
-/* ---------- persistence (MongoDB via /api/state) ---------- */
-let saveTimer = null;
-function setSyncStatus(text, cls){
-  const el = $('#syncStatus');
-  if(!el) return;
-  el.textContent = text;
-  el.className = cls || '';
-}
-function saveState(){
-  clearTimeout(saveTimer);
-  setSyncStatus('Đang lưu...', 'saving');
-  saveTimer = setTimeout(async () => {
-    try{
-      const res = await fetch('/api/state', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(state)
-      });
-      if(!res.ok){ const j = await res.json().catch(()=>({})); throw new Error(j.error||'Lưu thất bại'); }
-      setSyncStatus('Đã lưu ✓', '');
-    }catch(err){
-      console.error(err);
-      setSyncStatus('Lỗi lưu: ' + err.message, 'error');
-    }
-  }, 400); // gộp nhiều thay đổi liên tiếp lại thành 1 lần gọi API
-}
-async function loadState(){
-  try{
-    const res = await fetch('/api/state');
-    if(!res.ok){ const j = await res.json().catch(()=>({})); throw new Error(j.error||'Tải thất bại'); }
-    const data = await res.json();
-    state = { champions: data.champions||[], matchups: data.matchups||[] };
-    setSyncStatus('Đã tải dữ liệu ✓', '');
-  }catch(err){
-    console.error(err);
-    setSyncStatus('Lỗi tải dữ liệu: ' + err.message, 'error');
-  }
-}
+      /* ---------- persistence (MongoDB via /api/state) ---------- */
+      let saveTimer = null;
+      function setSyncStatus(text, cls) {
+        const el = $("#syncStatus");
+        if (!el) return;
+        el.textContent = text;
+        el.className = cls || "";
+      }
+      function saveState() {
+        clearTimeout(saveTimer);
+        setSyncStatus("Đang lưu...", "saving");
+        saveTimer = setTimeout(async () => {
+          try {
+            const res = await fetch("/api/state", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(state),
+            });
+            if (!res.ok) {
+              const j = await res.json().catch(() => ({}));
+              throw new Error(j.error || "Lưu thất bại");
+            }
+            setSyncStatus("Đã lưu ✓", "");
+          } catch (err) {
+            console.error(err);
+            setSyncStatus("Lỗi lưu: " + err.message, "error");
+          }
+        }, 400); // gộp nhiều thay đổi liên tiếp lại thành 1 lần gọi API
+      }
+      async function loadState() {
+        try {
+          const res = await fetch("/api/state");
+          if (!res.ok) {
+            const j = await res.json().catch(() => ({}));
+            throw new Error(j.error || "Tải thất bại");
+          }
+          const data = await res.json();
+          state = {
+            champions: data.champions || [],
+            matchups: data.matchups || [],
+          };
+          setSyncStatus("Đã tải dữ liệu ✓", "");
+        } catch (err) {
+          console.error(err);
+          setSyncStatus("Lỗi tải dữ liệu: " + err.message, "error");
+        }
+      }
 
-function findChamp(id){ return state.champions.find(c=>c.id===id); }
-function findChampByName(name){
-  const n = name.trim().toLowerCase();
-  return state.champions.find(c=>c.name.trim().toLowerCase()===n);
-}
-/* matchups where champId is the winner (champId counters someone) */
-function champCounters(champId){ return state.matchups.filter(m=>m.winnerId===champId); }
-/* matchups where champId is the loser (someone counters champId) */
-function champCounteredBy(champId){ return state.matchups.filter(m=>m.loserId===champId); }
+      function findChamp(id) {
+        return state.champions.find((c) => c.id === id);
+      }
+      function findChampByName(name) {
+        const n = name.trim().toLowerCase();
+        return state.champions.find((c) => c.name.trim().toLowerCase() === n);
+      }
+      /* matchups where champId is the winner (champId counters someone) */
+      function champCounters(champId) {
+        return state.matchups.filter((m) => m.winnerId === champId);
+      }
+      /* matchups where champId is the loser (someone counters champId) */
+      function champCounteredBy(champId) {
+        return state.matchups.filter((m) => m.loserId === champId);
+      }
 
-function renderRoleNav(){
-  const nav = $('#roleNav');
-  nav.innerHTML = ROLES.map(r=>`<button class="${r===currentRole?'active':''}" onclick="setRole('${r}')">${r}</button>`).join('');
-}
-function setRole(r){ currentRole=r; currentChampId=null; renderRoleNav(); renderMain(); }
+      function renderRoleNav() {
+        const nav = $("#roleNav");
+        nav.innerHTML = ROLES.map(
+          (r) =>
+            `<button class="${r === currentRole ? "active" : ""}" onclick="setRole('${r}')">${r}</button>`,
+        ).join("");
+      }
+      function setRole(r) {
+        currentRole = r;
+        currentChampId = null;
+        renderRoleNav();
+        renderMain();
+      }
 
-function renderMain(){
-  if(currentChampId){ renderChampionDetail(); return; }
-  const list = state.champions.filter(c=>c.role===currentRole);
-  const searchVal = ($('#searchBox')?.value || '').trim().toLowerCase();
-  const filtered = searchVal ? list.filter(c=>c.name.toLowerCase().includes(searchVal)) : list;
+      function renderMain() {
+        if (currentChampId) {
+          renderChampionDetail();
+          return;
+        }
+        const list = state.champions.filter((c) => c.role === currentRole);
+        const searchVal = ($("#searchBox")?.value || "").trim().toLowerCase();
+        const filtered = searchVal
+          ? list.filter((c) => c.name.toLowerCase().includes(searchVal))
+          : list;
 
-  $('#main').innerHTML = `
+        $("#main").innerHTML = `
     <div class="toolbar">
       <input class="search" id="searchBox" placeholder="Tìm tướng trong ${currentRole}..." value="${searchVal}" oninput="renderMain()">
       <button class="btn" onclick="openAddChampion()">+ Thêm tướng</button>
     </div>
     <div class="grid">
-      ${filtered.map(c=>championCardHtml(c)).join('')}
-      ${searchVal ? '' : `<div class="add-card" onclick="openAddChampion()">+</div>`}
+      ${filtered.map((c) => championCardHtml(c)).join("")}
+      ${searchVal ? "" : `<div class="add-card" onclick="openAddChampion()">+</div>`}
     </div>
-    ${filtered.length===0 ? `<div class="empty">Chưa có tướng nào trong ${currentRole}. Bấm "+ Thêm tướng" để bắt đầu.</div>` : ''}
+    ${filtered.length === 0 ? `<div class="empty">Chưa có tướng nào trong ${currentRole}. Bấm "+ Thêm tướng" để bắt đầu.</div>` : ""}
   `;
-  const box = $('#searchBox'); if(box && searchVal){ box.focus(); box.selectionStart = box.selectionEnd = box.value.length; }
-}
+        const box = $("#searchBox");
+        if (box && searchVal) {
+          box.focus();
+          box.selectionStart = box.selectionEnd = box.value.length;
+        }
+      }
 
-function championCardHtml(c){
-  const counters = champCounters(c.id).length;
-  const countered = champCounteredBy(c.id).length;
-  return `
+      function championCardHtml(c) {
+        const counters = champCounters(c.id).length;
+        const countered = champCounteredBy(c.id).length;
+        return `
     <div class="champ-card" onclick="openChampion('${c.id}')">
-      <div class="img">${c.image?`<img src="${c.image}">`:'Chưa có ảnh'}</div>
+      <div class="img">${c.image ? `<img src="${c.image}" alt="">` : "Chưa có ảnh"}</div>
       <div class="name">${escapeHtml(c.name)}</div>
-      <div class="meta">${countered} bị counter · ${counters} counter</div>
+      <div class="stats">
+        <span class="stat weak" title="Bị counter bởi">${countered}</span>
+        <span class="stat strong" title="Tôi counter">${counters}</span>
+      </div>
     </div>`;
-}
+      }
 
-function openChampion(id){ currentChampId=id; renderMain(); }
+      function openChampion(id) {
+        currentChampId = id;
+        renderMain();
+      }
 
-function renderChampionDetail(){
-  const c = findChamp(currentChampId);
-  if(!c){ currentChampId=null; renderMain(); return; }
-  const iCounter = champCounters(c.id);       // c counters these -> right column
-  const counteredBy = champCounteredBy(c.id); // these counter c -> left column
+      function renderChampionDetail() {
+        const c = findChamp(currentChampId);
+        if (!c) {
+          currentChampId = null;
+          renderMain();
+          return;
+        }
+        const iCounter = champCounters(c.id); // c counters these -> right column
+        const counteredBy = champCounteredBy(c.id); // these counter c -> left column
 
-  $('#main').innerHTML = `
+        $("#main").innerHTML = `
     <button class="back" onclick="currentChampId=null;renderMain()">&larr; Quay lại ${c.role}</button>
 
     <div class="matchup-layout">
       <div class="left">
-        <div class="col-title">Bị Counter Bởi <span class="n">${counteredBy.length}</span></div>
-        ${counteredBy.map(m=>matchupRowHtml(m, findChamp(m.winnerId))).join('')}
+        <div class="col-title weak-title"><span class="tick"></span>Bị counter bởi<span class="n">${counteredBy.length}</span></div>
+        ${counteredBy.map((m) => matchupRowHtml(m, findChamp(m.winnerId))).join("")}
         <button class="add-matchup-btn" onclick="openAddMatchup('${c.id}','COUNTERED_BY')">+ Thêm champion counter tôi</button>
       </div>
 
       <div class="center">
         <div class="center-card">
-          <div class="img" onclick="openEditChampion('${c.id}')">${c.image?`<img src="${c.image}">`:'Bấm để thêm ảnh'}</div>
+          <div class="portrait" onclick="openEditChampion('${c.id}')">
+            <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+            <div class="frame">${c.image ? `<img src="${c.image}" alt="">` : "Bấm để thêm ảnh"}</div>
+          </div>
           <h2>${escapeHtml(c.name)}</h2>
           <div class="role-tag">${c.role}</div>
           <div class="actions">
@@ -310,29 +893,29 @@ function renderChampionDetail(){
       </div>
 
       <div class="right">
-        <div class="col-title">Tôi Counter <span class="n">${iCounter.length}</span></div>
-        ${iCounter.map(m=>matchupRowHtml(m, findChamp(m.loserId))).join('')}
+        <div class="col-title strong-title"><span class="tick"></span>Tôi counter<span class="n">${iCounter.length}</span></div>
+        ${iCounter.map((m) => matchupRowHtml(m, findChamp(m.loserId))).join("")}
         <button class="add-matchup-btn" onclick="openAddMatchup('${c.id}','I_COUNTER')">+ Thêm champion tôi counter</button>
       </div>
     </div>
   `;
-}
+      }
 
-/* opponent = the champion on the other side of this matchup row */
-function matchupRowHtml(m, opponent){
-  if(!opponent) return '';
-  return `
+      /* opponent = the champion on the other side of this matchup row */
+      function matchupRowHtml(m, opponent) {
+        if (!opponent) return "";
+        return `
     <div class="matchup-row" onclick="openMatchupDetail('${m.id}')">
-      <div class="img">${opponent.image?`<img src="${opponent.image}">`:''}</div>
+      <div class="img">${opponent.image ? `<img src="${opponent.image}" alt="">` : ""}</div>
       <div class="name">${escapeHtml(opponent.name)}</div>
-      <div class="stars">${'★'.repeat(m.strength)}${'☆'.repeat(5-m.strength)}</div>
+      <div class="stars">${"★".repeat(m.strength)}${"☆".repeat(5 - m.strength)}</div>
     </div>`;
-}
+      }
 
-/* ---------- add / edit champion ---------- */
-function openAddChampion(){
-  pendingImage = null;
-  showModal(`
+      /* ---------- add / edit champion ---------- */
+      function openAddChampion() {
+        pendingImage = null;
+        showModal(`
     <h3>Thêm tướng</h3>
     <div class="field">
       <label>Tên tướng</label>
@@ -340,7 +923,7 @@ function openAddChampion(){
     </div>
     <div class="field">
       <label>Role</label>
-      <select id="fRole">${ROLES.map(r=>`<option ${r===currentRole?'selected':''}>${r}</option>`).join('')}</select>
+      <select id="fRole">${ROLES.map((r) => `<option ${r === currentRole ? "selected" : ""}>${r}</option>`).join("")}</select>
     </div>
     <div class="field">
       <label>Hình ảnh (tùy chọn, có thể thêm sau)</label>
@@ -354,20 +937,28 @@ function openAddChampion(){
       <button class="btn" onclick="saveChampion()">Lưu</button>
     </div>
   `);
-}
-function saveChampion(){
-  const name = $('#fName').value.trim();
-  if(!name){ $('#fName').focus(); return; }
-  if(findChampByName(name)){ alert('Tướng này đã tồn tại trong hệ thống rồi.'); return; }
-  const role = $('#fRole').value;
-  state.champions.push({ id:uid(), name, role, image:pendingImage });
-  closeModal(); renderMain(); saveState();
-}
+      }
+      function saveChampion() {
+        const name = $("#fName").value.trim();
+        if (!name) {
+          $("#fName").focus();
+          return;
+        }
+        if (findChampByName(name)) {
+          alert("Tướng này đã tồn tại trong hệ thống rồi.");
+          return;
+        }
+        const role = $("#fRole").value;
+        state.champions.push({ id: uid(), name, role, image: pendingImage });
+        closeModal();
+        renderMain();
+        saveState();
+      }
 
-function openEditChampion(id){
-  const c = findChamp(id);
-  pendingImage = c.image;
-  showModal(`
+      function openEditChampion(id) {
+        const c = findChamp(id);
+        pendingImage = c.image;
+        showModal(`
     <h3>Sửa tướng</h3>
     <div class="field">
       <label>Tên tướng</label>
@@ -375,12 +966,12 @@ function openEditChampion(id){
     </div>
     <div class="field">
       <label>Role</label>
-      <select id="fRole">${ROLES.map(r=>`<option ${r===c.role?'selected':''}>${r}</option>`).join('')}</select>
+      <select id="fRole">${ROLES.map((r) => `<option ${r === c.role ? "selected" : ""}>${r}</option>`).join("")}</select>
     </div>
     <div class="field">
       <label>Hình ảnh</label>
       <div class="imgpick">
-        <div class="prev" id="imgPrev">${c.image?`<img src="${c.image}">`:''}</div>
+        <div class="prev" id="imgPrev">${c.image ? `<img src="${c.image}" alt="">` : ""}</div>
         <input type="file" accept="image/*" onchange="handleImagePick(event,'imgPrev')">
       </div>
     </div>
@@ -389,33 +980,46 @@ function openEditChampion(id){
       <button class="btn" onclick="saveEditChampion('${id}')">Lưu thay đổi</button>
     </div>
   `);
-}
-function saveEditChampion(id){
-  const c = findChamp(id);
-  c.name = $('#fName').value.trim() || c.name;
-  c.role = $('#fRole').value;
-  c.image = pendingImage;
-  closeModal(); renderMain(); saveState();
-}
+      }
+      function saveEditChampion(id) {
+        const c = findChamp(id);
+        c.name = $("#fName").value.trim() || c.name;
+        c.role = $("#fRole").value;
+        c.image = pendingImage;
+        closeModal();
+        renderMain();
+        saveState();
+      }
 
-function deleteChampion(id){
-  if(!confirm('Xóa tướng này? Các matchup liên quan tới tướng này cũng sẽ bị xóa.')) return;
-  state.champions = state.champions.filter(c=>c.id!==id);
-  state.matchups = state.matchups.filter(m=>m.winnerId!==id && m.loserId!==id);
-  currentChampId=null; renderMain(); saveState();
-}
+      function deleteChampion(id) {
+        if (
+          !confirm(
+            "Xóa tướng này? Các matchup liên quan tới tướng này cũng sẽ bị xóa.",
+          )
+        )
+          return;
+        state.champions = state.champions.filter((c) => c.id !== id);
+        state.matchups = state.matchups.filter(
+          (m) => m.winnerId !== id && m.loserId !== id,
+        );
+        currentChampId = null;
+        renderMain();
+        saveState();
+      }
 
-/* ---------- add matchup modal ----------
+      /* ---------- add matchup modal ----------
    Links to a real champion: if the typed name matches an existing champion
    it re-uses that champion (and it will then show up correctly on BOTH
    champions' pages); otherwise it creates a new champion automatically. */
-function openAddMatchup(champId, relation){
-  pendingImage = null;
-  const c = findChamp(champId);
-  const options = state.champions.filter(x=>x.id!==champId)
-    .map(x=>`<option value="${escapeAttr(x.name)}">`).join('');
-  showModal(`
-    <h3>${relation==='I_COUNTER' ? `Champion ${escapeHtml(c.name)} counter` : `Champion counter ${escapeHtml(c.name)}`}</h3>
+      function openAddMatchup(champId, relation) {
+        pendingImage = null;
+        const c = findChamp(champId);
+        const options = state.champions
+          .filter((x) => x.id !== champId)
+          .map((x) => `<option value="${escapeAttr(x.name)}">`)
+          .join("");
+        showModal(`
+    <h3>${relation === "I_COUNTER" ? `Champion ${escapeHtml(c.name)} counter` : `Champion counter ${escapeHtml(c.name)}`}</h3>
     <div class="field">
       <label>Tên champion đối phương</label>
       <input type="text" id="mName" list="champOptions" placeholder="VD: Malphite">
@@ -424,7 +1028,7 @@ function openAddMatchup(champId, relation){
     </div>
     <div class="field">
       <label>Role của champion đối phương</label>
-      <select id="mRole">${ROLES.map(r=>`<option ${r===c.role?'selected':''}>${r}</option>`).join('')}</select>
+      <select id="mRole">${ROLES.map((r) => `<option ${r === c.role ? "selected" : ""}>${r}</option>`).join("")}</select>
     </div>
     <div class="field">
       <label>Hình ảnh (chỉ dùng nếu tạo tướng mới)</label>
@@ -436,7 +1040,7 @@ function openAddMatchup(champId, relation){
     <div class="field">
       <label>Mức độ counter</label>
       <div class="stars-pick" id="starsPick">
-        ${[1,2,3,4,5].map(n=>`<span data-n="${n}" onclick="pickStar(${n})">★</span>`).join('')}
+        ${[1, 2, 3, 4, 5].map((n) => `<span data-n="${n}" onclick="pickStar(${n})">★</span>`).join("")}
       </div>
     </div>
     <div class="field">
@@ -448,65 +1052,79 @@ function openAddMatchup(champId, relation){
       <button class="btn" onclick="saveMatchup('${champId}','${relation}')">Lưu</button>
     </div>
   `);
-  window._starVal = 3; pickStar(3);
-}
-function pickStar(n){
-  window._starVal = n;
-  document.querySelectorAll('#starsPick span').forEach(s=>{
-    s.classList.toggle('on', parseInt(s.dataset.n) <= n);
-  });
-}
-function saveMatchup(champId, relation){
-  const name = $('#mName').value.trim();
-  if(!name){ $('#mName').focus(); return; }
-  const note = $('#mNote').value.trim();
-  const strength = window._starVal||3;
+        window._starVal = 3;
+        pickStar(3);
+      }
+      function pickStar(n) {
+        window._starVal = n;
+        document.querySelectorAll("#starsPick span").forEach((s) => {
+          s.classList.toggle("on", parseInt(s.dataset.n) <= n);
+        });
+      }
+      function saveMatchup(champId, relation) {
+        const name = $("#mName").value.trim();
+        if (!name) {
+          $("#mName").focus();
+          return;
+        }
+        const note = $("#mNote").value.trim();
+        const strength = window._starVal || 3;
 
-  let opponent = findChampByName(name);
-  if(!opponent){
-    opponent = { id:uid(), name, role:$('#mRole').value, image:pendingImage };
-    state.champions.push(opponent);
-  } else if(pendingImage && !opponent.image){
-    opponent.image = pendingImage;
-  }
+        let opponent = findChampByName(name);
+        if (!opponent) {
+          opponent = {
+            id: uid(),
+            name,
+            role: $("#mRole").value,
+            image: pendingImage,
+          };
+          state.champions.push(opponent);
+        } else if (pendingImage && !opponent.image) {
+          opponent.image = pendingImage;
+        }
 
-  const winnerId = relation==='I_COUNTER' ? champId : opponent.id;
-  const loserId  = relation==='I_COUNTER' ? opponent.id : champId;
+        const winnerId = relation === "I_COUNTER" ? champId : opponent.id;
+        const loserId = relation === "I_COUNTER" ? opponent.id : champId;
 
-  const existing = state.matchups.find(m=>m.winnerId===winnerId && m.loserId===loserId);
-  if(existing){
-    existing.strength = strength; existing.note = note;
-  } else {
-    state.matchups.push({ id:uid(), winnerId, loserId, strength, note });
-  }
-  closeModal(); renderMain(); saveState();
-}
+        const existing = state.matchups.find(
+          (m) => m.winnerId === winnerId && m.loserId === loserId,
+        );
+        if (existing) {
+          existing.strength = strength;
+          existing.note = note;
+        } else {
+          state.matchups.push({ id: uid(), winnerId, loserId, strength, note });
+        }
+        closeModal();
+        renderMain();
+        saveState();
+      }
 
-/* ---------- matchup detail / edit (note only shows once clicked) ---------- */
-function openMatchupDetail(matchupId){
-  const m = state.matchups.find(x=>x.id===matchupId);
-  const winner = findChamp(m.winnerId);
-  const loser = findChamp(m.loserId);
-  if(!winner || !loser) return;
+      /* ---------- matchup detail / edit (note only shows once clicked) ---------- */
+      function openMatchupDetail(matchupId) {
+        const m = state.matchups.find((x) => x.id === matchupId);
+        const winner = findChamp(m.winnerId);
+        const loser = findChamp(m.loserId);
+        if (!winner || !loser) return;
 
-  showModal(`
+        showModal(`
     <h3>Chi tiết matchup</h3>
     <div class="mdetail">
       <div class="vs">
         <div class="side" onclick="closeModal();openChampion('${winner.id}')">
-          <div class="img">${winner.image?`<img src="${winner.image}">`:''}</div>
+          <div class="img">${winner.image ? `<img src="${winner.image}" alt="">` : ""}</div>
           <div>${escapeHtml(winner.name)}</div>
         </div>
         <div class="arrow">counters &rarr;</div>
         <div class="side" onclick="closeModal();openChampion('${loser.id}')">
-          <div class="img">${loser.image?`<img src="${loser.image}">`:''}</div>
+          <div class="img">${loser.image ? `<img src="${loser.image}" alt="">` : ""}</div>
           <div>${escapeHtml(loser.name)}</div>
         </div>
       </div>
-      <div class="stars-row">${'★'.repeat(m.strength)}${'☆'.repeat(5-m.strength)}</div>
+      <div class="stars-row">${"★".repeat(m.strength)}${"☆".repeat(5 - m.strength)}</div>
       <div>
-        <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Ghi chú</label>
-        <div class="note-block">${escapeHtml(m.note||'')}</div>
+        <label style="display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:7px;font-weight:600;">Ghi chú</label>
+        <div class="note-block">${escapeHtml(m.note || "")}</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -515,22 +1133,22 @@ function openMatchupDetail(matchupId){
       <button class="btn" onclick="closeModal()">Đóng</button>
     </div>
   `);
-}
-function editMatchup(matchupId){
-  const m = state.matchups.find(x=>x.id===matchupId);
-  const winner = findChamp(m.winnerId);
-  const loser = findChamp(m.loserId);
-  showModal(`
+      }
+      function editMatchup(matchupId) {
+        const m = state.matchups.find((x) => x.id === matchupId);
+        const winner = findChamp(m.winnerId);
+        const loser = findChamp(m.loserId);
+        showModal(`
     <h3>Sửa matchup — ${escapeHtml(winner.name)} vs ${escapeHtml(loser.name)}</h3>
     <div class="field">
       <label>Mức độ counter</label>
       <div class="stars-pick" id="starsPick">
-        ${[1,2,3,4,5].map(n=>`<span data-n="${n}" onclick="pickStar(${n})">★</span>`).join('')}
+        ${[1, 2, 3, 4, 5].map((n) => `<span data-n="${n}" onclick="pickStar(${n})">★</span>`).join("")}
       </div>
     </div>
     <div class="field">
       <label>Ghi chú matchup</label>
-      <textarea id="mNote">${escapeHtml(m.note||'')}</textarea>
+      <textarea id="mNote">${escapeHtml(m.note || "")}</textarea>
     </div>
     <div class="hint" style="margin-bottom:14px;">Để đổi tên/ảnh tướng, vào trang của tướng đó và bấm Sửa.</div>
     <div class="modal-actions">
@@ -538,61 +1156,84 @@ function editMatchup(matchupId){
       <button class="btn" onclick="saveEditMatchup('${matchupId}')">Lưu thay đổi</button>
     </div>
   `);
-  window._starVal = m.strength; pickStar(m.strength);
-}
-function saveEditMatchup(matchupId){
-  const m = state.matchups.find(x=>x.id===matchupId);
-  m.strength = window._starVal || m.strength;
-  m.note = $('#mNote').value.trim();
-  closeModal(); renderMain(); saveState();
-}
-function deleteMatchup(matchupId){
-  if(!confirm('Xóa matchup này?')) return;
-  state.matchups = state.matchups.filter(x=>x.id!==matchupId);
-  closeModal(); renderMain(); saveState();
-}
+        window._starVal = m.strength;
+        pickStar(m.strength);
+      }
+      function saveEditMatchup(matchupId) {
+        const m = state.matchups.find((x) => x.id === matchupId);
+        m.strength = window._starVal || m.strength;
+        m.note = $("#mNote").value.trim();
+        closeModal();
+        renderMain();
+        saveState();
+      }
+      function deleteMatchup(matchupId) {
+        if (!confirm("Xóa matchup này?")) return;
+        state.matchups = state.matchups.filter((x) => x.id !== matchupId);
+        closeModal();
+        renderMain();
+        saveState();
+      }
 
-/* ---------- image handling ---------- */
-function handleImagePick(evt, previewId){
-  const file = evt.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    pendingImage = e.target.result;
-    $('#'+previewId).innerHTML = `<img src="${pendingImage}">`;
-  };
-  reader.readAsDataURL(file);
-}
+      /* ---------- image handling ---------- */
+      function handleImagePick(evt, previewId) {
+        const file = evt.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          pendingImage = e.target.result;
+          $("#" + previewId).innerHTML = `<img src="${pendingImage}" alt="">`;
+        };
+        reader.readAsDataURL(file);
+      }
 
-/* ---------- modal plumbing ---------- */
-function showModal(html){
-  let ov = document.getElementById('overlay');
-  if(!ov){
-    ov = document.createElement('div');
-    ov.id='overlay'; ov.className='overlay';
-    ov.onclick = (e)=>{ if(e.target===ov) closeModal(); };
-    document.body.appendChild(ov);
-  }
-  ov.innerHTML = `<div class="modal">${html}</div>`;
-  ov.style.display='flex';
-}
-function closeModal(){
-  const ov = document.getElementById('overlay');
-  if(ov) ov.style.display='none';
-  pendingImage = null;
-}
+      /* ---------- modal plumbing ---------- */
+      function showModal(html) {
+        let ov = document.getElementById("overlay");
+        if (!ov) {
+          ov = document.createElement("div");
+          ov.id = "overlay";
+          ov.className = "overlay";
+          ov.onclick = (e) => {
+            if (e.target === ov) closeModal();
+          };
+          document.body.appendChild(ov);
+        }
+        ov.innerHTML = `<div class="modal">${html}</div>`;
+        ov.style.display = "flex";
+      }
+      function closeModal() {
+        const ov = document.getElementById("overlay");
+        if (ov) ov.style.display = "none";
+        pendingImage = null;
+      }
 
-/* ---------- utils ---------- */
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;'); }
+      /* ---------- utils ---------- */
+      function escapeHtml(s) {
+        return (s || "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+      function escapeAttr(s) {
+        return escapeHtml(s).replace(/"/g, "&quot;");
+      }
 
-/* ---------- init ---------- */
-renderRoleNav();
-(async () => {
-  $('#main').innerHTML = '<div class="empty">Đang tải dữ liệu từ server...</div>';
-  await loadState();
-  renderMain();
-})();
-</script>
-</body>
+      /* ---------- init ---------- */
+      renderRoleNav();
+      (async () => {
+        $("#main").innerHTML =
+          '<div class="empty">Đang tải dữ liệu từ server...</div>';
+        await loadState();
+        renderMain();
+      })();
+    </script>
+  </body>
 </html>
