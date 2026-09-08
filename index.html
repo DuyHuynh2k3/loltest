@@ -5,27 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sổ Counter Cá Nhân</title>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
       :root {
-        --ink: #0a0e13;
-        --panel: #121821;
-        --panel-2: #171f2a;
-        --rule: #232e3a;
-        --rule-soft: #1a2430;
+        --ink: #080a0f;
+        --panel: #10141c;
+        --panel-2: #151b25;
+        --panel-3: #1b2330;
+        --rule: #232c3a;
+        --rule-soft: #171f2a;
 
-        --brass: #b98a52;
-        --brass-bright: #d9ac72;
-        --brass-dim: #6b5537;
+        --brass: #c99a4a;
+        --brass-bright: #eec37c;
+        --brass-dim: #5a4525;
+        --brass-glow: rgba(201, 154, 74, 0.16);
 
-        --advantage: #5ba184;
-        --advantage-bright: #79c2a3;
-        --weakness: #c1604f;
-        --weakness-bright: #dd7b68;
+        --advantage: #4fae86;
+        --advantage-bright: #7ddab0;
+        --weakness: #cf5a49;
+        --weakness-bright: #f0806c;
 
-        --text: #dfe6ec;
-        --text-dim: #889aa8;
-        --text-faint: #4d5c6a;
+        --text: #e9eef4;
+        --text-dim: #8b9bad;
+        --text-faint: #4d5a6b;
+
+        --shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.55);
       }
       * {
         box-sizing: border-box;
@@ -35,7 +39,18 @@
       }
       body {
         margin: 0;
-        background: var(--ink);
+        background:
+          radial-gradient(
+            900px 500px at 12% -8%,
+            rgba(201, 154, 74, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            700px 460px at 92% 8%,
+            rgba(79, 174, 134, 0.05),
+            transparent 55%
+          ),
+          var(--ink);
         color: var(--text);
         font-family: "Space Grotesk", sans-serif;
         min-height: 100vh;
@@ -71,6 +86,9 @@
         outline: 2px solid var(--brass-bright);
         outline-offset: 2px;
       }
+      svg {
+        display: block;
+      }
 
       @media (prefers-reduced-motion: reduce) {
         * {
@@ -81,32 +99,72 @@
 
       /* ---------- header ---------- */
       header {
-        padding: 30px 34px 20px;
+        padding: 26px 34px;
         border-bottom: 1px solid var(--rule);
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
+        align-items: center;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 14px;
         background: linear-gradient(
           180deg,
-          rgba(185, 138, 82, 0.05),
-          transparent 70%
+          rgba(201, 154, 74, 0.06),
+          transparent 75%
         );
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(10px);
+        background-color: rgba(8, 10, 15, 0.86);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .crest {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        border: 1px solid var(--rule);
+        background: linear-gradient(150deg, var(--panel-2), var(--panel));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: var(--brass-bright);
+        box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.12);
       }
       header h1 {
-        font-size: 27px;
+        font-size: 22px;
         color: var(--brass-bright);
+        line-height: 1.1;
       }
       header .sub {
         color: var(--text-dim);
-        font-size: 13px;
-        margin-top: 5px;
+        font-size: 12.5px;
+        margin-top: 4px;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      #headerStats {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      #headerStats b {
+        color: var(--text);
+        font-weight: 600;
       }
       #syncStatus {
-        font-size: 12px;
+        font-size: 11.5px;
         color: var(--text-faint);
         letter-spacing: 0.02em;
+        white-space: nowrap;
       }
       #syncStatus.saving {
         color: var(--brass-bright);
@@ -119,37 +177,51 @@
       nav.roles {
         display: flex;
         gap: 4px;
-        padding: 0 34px;
+        padding: 10px 30px;
         border-bottom: 1px solid var(--rule);
         background: var(--panel);
         overflow-x: auto;
       }
       nav.roles button {
         background: none;
-        border: none;
+        border: 1px solid transparent;
         color: var(--text-faint);
-        padding: 15px 16px;
+        padding: 9px 15px;
         cursor: pointer;
         font-size: 12.5px;
         font-weight: 600;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.03em;
         white-space: nowrap;
-        border-bottom: 2px solid transparent;
+        border-radius: 7px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
         transition:
           color 0.15s,
+          background 0.15s,
           border-color 0.15s;
+      }
+      nav.roles button .role-icon {
+        width: 15px;
+        height: 15px;
+        opacity: 0.8;
       }
       nav.roles button.active {
         color: var(--brass-bright);
-        border-bottom-color: var(--brass);
+        background: var(--brass-glow);
+        border-color: rgba(201, 154, 74, 0.35);
       }
-      nav.roles button:hover {
+      nav.roles button.active .role-icon {
+        opacity: 1;
+      }
+      nav.roles button:not(.active):hover {
         color: var(--text);
+        background: var(--panel-2);
       }
 
       main {
-        padding: 30px 34px 70px;
-        max-width: 1120px;
+        padding: 28px 34px 70px;
+        max-width: 1160px;
         margin: 0 auto;
       }
 
@@ -162,14 +234,26 @@
         margin-bottom: 22px;
         flex-wrap: wrap;
       }
+      .search-wrap {
+        position: relative;
+        width: 260px;
+      }
+      .search-wrap svg {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-faint);
+        pointer-events: none;
+      }
       .search {
         background: var(--panel);
         border: 1px solid var(--rule);
-        border-radius: 4px;
-        padding: 10px 13px;
+        border-radius: 7px;
+        padding: 10px 13px 10px 34px;
         color: var(--text);
         font-size: 13.5px;
-        width: 250px;
+        width: 100%;
         transition: border-color 0.15s;
       }
       .search:focus {
@@ -181,17 +265,25 @@
 
       .btn {
         background: var(--brass);
-        color: #0a0e13;
+        color: #171006;
         border: none;
         padding: 10px 18px;
-        border-radius: 4px;
+        border-radius: 7px;
         cursor: pointer;
         font-weight: 600;
         font-size: 13px;
-        transition: background 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition:
+          background 0.15s,
+          transform 0.1s;
       }
       .btn:hover {
         background: var(--brass-bright);
+      }
+      .btn:active {
+        transform: translateY(1px);
       }
       .btn.secondary {
         background: transparent;
@@ -213,39 +305,44 @@
       }
       .btn.danger:hover {
         background: var(--weakness);
-        color: #0a0e13;
+        color: #170906;
       }
 
       /* ---------- roster grid ---------- */
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+        gap: 14px;
       }
       .champ-card {
-        background: var(--panel);
+        background: linear-gradient(160deg, var(--panel-2), var(--panel));
         border: 1px solid var(--rule-soft);
-        border-radius: 5px;
+        border-radius: 10px;
         overflow: hidden;
         cursor: pointer;
         text-align: center;
         transition:
-          border-color 0.15s,
-          transform 0.15s;
+          border-color 0.18s,
+          transform 0.18s,
+          box-shadow 0.18s;
       }
       .champ-card:hover {
         border-color: var(--brass-dim);
-        transform: translateY(-2px);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+      }
+      .champ-card .card-top {
+        position: relative;
       }
       .champ-card .img {
         width: 100%;
         aspect-ratio: 1;
-        background: var(--panel-2);
+        background: var(--panel-3);
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--text-faint);
-        font-size: 11px;
+        font-size: 10.5px;
         overflow: hidden;
       }
       .champ-card .img img {
@@ -253,10 +350,44 @@
         height: 100%;
         object-fit: cover;
       }
+      .champ-card .net-chip {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 5px;
+        border-radius: 6px;
+        font-size: 10.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid;
+        backdrop-filter: blur(3px);
+      }
+      .champ-card .net-chip.up {
+        color: var(--advantage-bright);
+        background: rgba(79, 174, 134, 0.16);
+        border-color: rgba(79, 174, 134, 0.4);
+      }
+      .champ-card .net-chip.down {
+        color: var(--weakness-bright);
+        background: rgba(207, 90, 73, 0.16);
+        border-color: rgba(207, 90, 73, 0.4);
+      }
+      .champ-card .net-chip.even {
+        color: var(--text-dim);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--rule);
+      }
       .champ-card .name {
-        padding: 10px 8px 4px;
-        font-size: 13.5px;
+        padding: 10px 8px 3px;
+        font-size: 13px;
         font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .champ-card .stats {
         display: flex;
@@ -265,25 +396,32 @@
         padding: 0 8px 10px;
       }
       .champ-card .stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
         font-size: 11px;
         font-weight: 600;
         padding: 2px 7px;
         border-radius: 9px;
         line-height: 1.5;
       }
+      .champ-card .stat svg {
+        width: 10px;
+        height: 10px;
+      }
       .champ-card .stat.weak {
         color: var(--weakness-bright);
-        background: rgba(193, 96, 79, 0.12);
+        background: rgba(207, 90, 73, 0.12);
       }
       .champ-card .stat.strong {
         color: var(--advantage-bright);
-        background: rgba(91, 161, 132, 0.12);
+        background: rgba(79, 174, 134, 0.12);
       }
 
       .add-card {
         background: none;
-        border: 1px dashed var(--rule);
-        border-radius: 5px;
+        border: 1.5px dashed var(--rule);
+        border-radius: 10px;
         aspect-ratio: 0.8;
         display: flex;
         align-items: center;
@@ -293,16 +431,18 @@
         font-size: 22px;
         transition:
           border-color 0.15s,
-          color 0.15s;
+          color 0.15s,
+          background 0.15s;
       }
       .add-card:hover {
         border-color: var(--brass);
         color: var(--brass-bright);
+        background: var(--brass-glow);
       }
 
       .empty {
         color: var(--text-faint);
-        padding: 44px 0;
+        padding: 54px 0;
         text-align: center;
         font-size: 14px;
       }
@@ -327,8 +467,8 @@
       /* ---------- matchup layout ---------- */
       .matchup-layout {
         display: grid;
-        grid-template-columns: 1fr 1.1fr 1fr;
-        gap: 24px;
+        grid-template-columns: 1fr 1.05fr 1fr;
+        gap: 22px;
         align-items: start;
       }
       @media (max-width: 760px) {
@@ -339,54 +479,69 @@
           order: -1;
           margin-bottom: 8px;
         }
+        .center-card {
+          position: static;
+        }
       }
 
       .col-title {
-        font-size: 12.5px;
+        font-size: 12px;
         color: var(--text-dim);
         font-weight: 600;
         margin-bottom: 12px;
         display: flex;
         align-items: center;
         gap: 8px;
+        letter-spacing: 0.01em;
       }
       .col-title .tick {
-        width: 7px;
-        height: 7px;
-        border-radius: 1px;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
         flex-shrink: 0;
       }
       .col-title.weak-title .tick {
         background: var(--weakness);
+        box-shadow: 0 0 8px rgba(207, 90, 73, 0.6);
       }
       .col-title.strong-title .tick {
         background: var(--advantage);
+        box-shadow: 0 0 8px rgba(79, 174, 134, 0.6);
       }
       .col-title span.n {
-        color: var(--text-faint);
+        color: var(--text-dim);
         margin-left: auto;
-        font-size: 11.5px;
+        font-size: 11px;
+        background: var(--panel-2);
+        border: 1px solid var(--rule);
+        padding: 1px 8px;
+        border-radius: 8px;
       }
 
       .matchup-row {
         display: flex;
         align-items: center;
         gap: 11px;
-        padding: 10px 11px;
+        padding: 9px 10px;
         background: var(--panel);
         border: 1px solid var(--rule-soft);
-        border-radius: 4px;
-        margin-bottom: 8px;
+        border-radius: 8px;
+        margin-bottom: 7px;
         cursor: pointer;
-        transition: border-color 0.15s;
+        transition:
+          border-color 0.15s,
+          transform 0.12s,
+          background 0.15s;
       }
       .matchup-row:hover {
         border-color: var(--brass-dim);
+        background: var(--panel-2);
+        transform: translateX(2px);
       }
       .matchup-row .img {
         width: 38px;
         height: 38px;
-        border-radius: 4px;
+        border-radius: 7px;
         overflow: hidden;
         background: var(--panel-2);
         flex-shrink: 0;
@@ -401,34 +556,66 @@
         height: 100%;
         object-fit: cover;
       }
-      .matchup-row .name {
+      .matchup-row .row-info {
         flex: 1;
+        min-width: 0;
+      }
+      .matchup-row .name {
         font-size: 13.5px;
         font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .matchup-row .stars {
         color: var(--brass);
-        font-size: 12px;
+        font-size: 11px;
         letter-spacing: 1px;
+        margin-top: 1px;
+      }
+      .matchup-row .score-dial {
+        --pct: 60%;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: conic-gradient(var(--brass) var(--pct), var(--rule) 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .matchup-row .score-dial span {
+        width: 21px;
+        height: 21px;
+        border-radius: 50%;
+        background: var(--panel);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10.5px;
+        font-weight: 700;
+        color: var(--brass-bright);
       }
 
       .add-matchup-btn {
         width: 100%;
         padding: 11px;
         background: none;
-        border: 1px dashed var(--rule);
+        border: 1.5px dashed var(--rule);
         color: var(--text-faint);
-        border-radius: 4px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 12.5px;
         margin-top: 3px;
         transition:
           border-color 0.15s,
-          color 0.15s;
+          color 0.15s,
+          background 0.15s;
       }
       .add-matchup-btn:hover {
         border-color: var(--brass);
         color: var(--brass-bright);
+        background: var(--brass-glow);
       }
 
       /* ---------- focus card (center) ---------- */
@@ -443,28 +630,41 @@
         }
       }
       .center-card {
-        background: var(--panel);
+        background: linear-gradient(165deg, var(--panel-2), var(--panel));
         border: 1px solid var(--rule);
-        border-radius: 6px;
-        padding: 26px 18px;
+        border-radius: 12px;
+        padding: 28px 20px 22px;
         text-align: center;
         position: sticky;
-        top: 22px;
+        top: 92px;
         animation: focusIn 0.35s ease-out;
+        box-shadow: var(--shadow);
       }
       .portrait {
         position: relative;
-        width: 116px;
-        height: 116px;
+        width: 120px;
+        height: 120px;
         margin: 0 auto 16px;
         cursor: pointer;
       }
+      .portrait::before {
+        content: "";
+        position: absolute;
+        inset: -18px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(201, 154, 74, 0.16),
+          transparent 70%
+        );
+      }
       .portrait .frame {
+        position: relative;
         width: 100%;
         height: 100%;
-        border-radius: 4px;
+        border-radius: 8px;
         overflow: hidden;
-        background: var(--panel-2);
+        background: var(--panel-3);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -482,6 +682,7 @@
         height: 16px;
         border-color: var(--brass);
         transition: border-color 0.15s;
+        z-index: 2;
       }
       .portrait .corner.tl {
         top: -5px;
@@ -512,14 +713,53 @@
       }
 
       .center-card h2 {
-        font-size: 24px;
-        margin-bottom: 4px;
+        font-size: 23px;
+        margin-bottom: 5px;
       }
       .center-card .role-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         color: var(--text-dim);
-        font-size: 12px;
-        letter-spacing: 0.06em;
+        font-size: 11.5px;
+        letter-spacing: 0.05em;
         margin-bottom: 18px;
+        background: var(--panel-3);
+        border: 1px solid var(--rule);
+        padding: 3px 11px 3px 8px;
+        border-radius: 20px;
+      }
+      .center-card .role-tag svg {
+        width: 12px;
+        height: 12px;
+        opacity: 0.85;
+      }
+      .balance-bar {
+        height: 6px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--weakness);
+        margin-bottom: 7px;
+      }
+      .balance-bar .fill {
+        height: 100%;
+        background: var(--advantage);
+      }
+      .balance-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--text-faint);
+        margin-bottom: 20px;
+      }
+      .balance-label b {
+        font-weight: 600;
+      }
+      .balance-label .w b {
+        color: var(--advantage-bright);
+      }
+      .balance-label .l b {
+        color: var(--weakness-bright);
       }
       .center-card .actions {
         display: flex;
@@ -531,7 +771,8 @@
       .overlay {
         position: fixed;
         inset: 0;
-        background: rgba(5, 8, 12, 0.72);
+        background: rgba(4, 6, 9, 0.75);
+        backdrop-filter: blur(2px);
         display: flex;
         align-items: flex-start;
         justify-content: center;
@@ -539,14 +780,26 @@
         overflow-y: auto;
         z-index: 50;
       }
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
       .modal {
-        background: var(--panel);
+        background: linear-gradient(165deg, var(--panel-2), var(--panel));
         border: 1px solid var(--rule);
-        border-radius: 6px;
+        border-radius: 12px;
         width: 100%;
         max-width: 460px;
         padding: 28px;
         margin-bottom: 40px;
+        box-shadow: var(--shadow);
+        animation: modalIn 0.18s ease-out;
       }
       .modal h3 {
         margin: 0 0 20px;
@@ -577,7 +830,7 @@
         border: 1px solid var(--rule);
         color: var(--text);
         padding: 10px 11px;
-        border-radius: 4px;
+        border-radius: 6px;
         font-size: 14px;
         transition: border-color 0.15s;
       }
@@ -598,7 +851,7 @@
       .field .imgpick .prev {
         width: 48px;
         height: 48px;
-        border-radius: 4px;
+        border-radius: 6px;
         background: var(--ink);
         border: 1px solid var(--rule);
         overflow: hidden;
@@ -626,7 +879,13 @@
       .stars-pick span {
         cursor: pointer;
         color: var(--rule);
-        transition: color 0.1s;
+        transition:
+          color 0.1s,
+          transform 0.1s;
+        display: inline-block;
+      }
+      .stars-pick span:hover {
+        transform: scale(1.12);
       }
       .stars-pick span.on {
         color: var(--brass);
@@ -649,16 +908,17 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 20px;
+        gap: 18px;
       }
       .mdetail .vs .side {
         text-align: center;
         cursor: pointer;
+        width: 88px;
       }
       .mdetail .vs .img {
         width: 66px;
         height: 66px;
-        border-radius: 5px;
+        border-radius: 8px;
         overflow: hidden;
         background: var(--panel-2);
         margin: 0 auto 7px;
@@ -678,9 +938,26 @@
       .mdetail .vs .side:hover .img {
         border-color: var(--brass);
       }
+      .mdetail .vs .side div:last-child {
+        font-size: 12.5px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .mdetail .vs .arrow {
         color: var(--advantage-bright);
-        font-size: 19px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .mdetail .vs .arrow svg {
+        width: 20px;
+        height: 20px;
       }
       .mdetail .stars-row {
         text-align: center;
@@ -691,7 +968,7 @@
       .mdetail .note-block {
         background: var(--ink);
         border: 1px solid var(--rule);
-        border-radius: 4px;
+        border-radius: 6px;
         padding: 15px;
         white-space: pre-wrap;
         font-size: 13.5px;
@@ -707,11 +984,33 @@
   </head>
   <body>
     <header>
-      <div>
-        <h1>Sổ Counter Cá Nhân</h1>
-        <div class="sub">Champion pool &amp; matchup notes của riêng bạn</div>
+      <div class="brand">
+        <div class="crest">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 2 4 5.5v6c0 5 3.4 8.6 8 10.5 4.6-1.9 8-5.5 8-10.5v-6L12 2Z"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+            <path
+              d="m9 12 2 2 4-4.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1>Sổ Counter Cá Nhân</h1>
+          <div class="sub">Champion pool &amp; matchup notes của riêng bạn</div>
+        </div>
       </div>
-      <div id="syncStatus">Đang tải dữ liệu...</div>
+      <div class="header-right">
+        <div id="headerStats"></div>
+        <div id="syncStatus">Đang tải dữ liệu...</div>
+      </div>
     </header>
 
     <nav class="roles" id="roleNav"></nav>
@@ -795,11 +1094,21 @@
         return state.matchups.filter((m) => m.loserId === champId);
       }
 
+      const ROLE_ICON = {
+        TOP: '<svg viewBox="0 0 20 20" fill="none"><path d="M10 2 3 5.5v4c0 4.2 2.9 7.2 7 8.5 4.1-1.3 7-4.3 7-8.5v-4L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+        JUNGLE:
+          '<svg viewBox="0 0 20 20" fill="none"><path d="M10 3c2 2.5 3 5 3 7.5A3 3 0 0 1 10 13.5 3 3 0 0 1 7 10.5C7 8 8 5.5 10 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 13.5V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+        MID: '<svg viewBox="0 0 20 20" fill="none"><path d="M4 16 16 4M4 4h5M4 4v5M16 16h-5M16 16v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        ADC: '<svg viewBox="0 0 20 20" fill="none"><path d="M3 17 15 5M11 3l4 4M13 9l-2-2M9 13l-2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        SUPPORT:
+          '<svg viewBox="0 0 20 20" fill="none"><path d="M10 17.5s-6-3.6-6-8.3A3.6 3.6 0 0 1 10 6.6a3.6 3.6 0 0 1 6 2.6c0 4.7-6 8.3-6 8.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+      };
+
       function renderRoleNav() {
         const nav = $("#roleNav");
         nav.innerHTML = ROLES.map(
           (r) =>
-            `<button class="${r === currentRole ? "active" : ""}" onclick="setRole('${r}')">${r}</button>`,
+            `<button class="${r === currentRole ? "active" : ""}" onclick="setRole('${r}')"><span class="role-icon">${ROLE_ICON[r] || ""}</span>${r}</button>`,
         ).join("");
       }
       function setRole(r) {
@@ -809,7 +1118,14 @@
         renderMain();
       }
 
+      function renderHeaderStats() {
+        const el = $("#headerStats");
+        if (!el) return;
+        el.innerHTML = `<span><b>${state.champions.length}</b> tướng</span><span><b>${state.matchups.length}</b> matchup</span>`;
+      }
+
       function renderMain() {
+        renderHeaderStats();
         if (currentChampId) {
           renderChampionDetail();
           return;
@@ -822,8 +1138,14 @@
 
         $("#main").innerHTML = `
     <div class="toolbar">
-      <input class="search" id="searchBox" placeholder="Tìm tướng trong ${currentRole}..." value="${searchVal}" oninput="renderMain()">
-      <button class="btn" onclick="openAddChampion()">+ Thêm tướng</button>
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m17 17-3.8-3.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input class="search" id="searchBox" placeholder="Tìm tướng trong ${currentRole}..." value="${searchVal}" oninput="renderMain()">
+      </div>
+      <button class="btn" onclick="openAddChampion()">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Thêm tướng
+      </button>
     </div>
     <div class="grid">
       ${filtered.map((c) => championCardHtml(c)).join("")}
@@ -841,13 +1163,19 @@
       function championCardHtml(c) {
         const counters = champCounters(c.id).length;
         const countered = champCounteredBy(c.id).length;
+        const net = counters - countered;
+        const netClass = net > 0 ? "up" : net < 0 ? "down" : "even";
+        const netLabel = net > 0 ? `+${net}` : `${net}`;
         return `
     <div class="champ-card" onclick="openChampion('${c.id}')">
-      <div class="img">${c.image ? `<img src="${c.image}" alt="">` : "Chưa có ảnh"}</div>
+      <div class="card-top">
+        <div class="img">${c.image ? `<img src="${c.image}" alt="">` : "Chưa có ảnh"}</div>
+        ${counters + countered > 0 ? `<div class="net-chip ${netClass}" title="Chênh lệch counter">${netLabel}</div>` : ""}
+      </div>
       <div class="name">${escapeHtml(c.name)}</div>
       <div class="stats">
-        <span class="stat weak" title="Bị counter bởi">${countered}</span>
-        <span class="stat strong" title="Tôi counter">${counters}</span>
+        <span class="stat weak" title="Bị counter bởi"><svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${countered}</span>
+        <span class="stat strong" title="Tôi counter"><svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M10 16V4M4 10l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${counters}</span>
       </div>
     </div>`;
       }
@@ -866,9 +1194,14 @@
         }
         const iCounter = champCounters(c.id); // c counters these -> right column
         const counteredBy = champCounteredBy(c.id); // these counter c -> left column
+        const total = iCounter.length + counteredBy.length;
+        const winPct = total ? Math.round((iCounter.length / total) * 100) : 50;
 
         $("#main").innerHTML = `
-    <button class="back" onclick="currentChampId=null;renderMain()">&larr; Quay lại ${c.role}</button>
+    <button class="back" onclick="currentChampId=null;renderMain()">
+      <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M12 4 6 10l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Quay lại ${c.role}
+    </button>
 
     <div class="matchup-layout">
       <div class="left">
@@ -884,7 +1217,13 @@
             <div class="frame">${c.image ? `<img src="${c.image}" alt="">` : "Bấm để thêm ảnh"}</div>
           </div>
           <h2>${escapeHtml(c.name)}</h2>
-          <div class="role-tag">${c.role}</div>
+          <div class="role-tag"><span class="role-icon">${ROLE_ICON[c.role] || ""}</span>${c.role}</div>
+          ${
+            total > 0
+              ? `<div class="balance-bar"><div class="fill" style="width:${winPct}%"></div></div>
+          <div class="balance-label"><span class="w">Counter <b>${iCounter.length}</b></span><span class="l">Bị counter <b>${counteredBy.length}</b></span></div>`
+              : ""
+          }
           <div class="actions">
             <button class="btn small secondary" onclick="openEditChampion('${c.id}')">Sửa</button>
             <button class="btn small danger" onclick="deleteChampion('${c.id}')">Xóa</button>
@@ -907,8 +1246,11 @@
         return `
     <div class="matchup-row" onclick="openMatchupDetail('${m.id}')">
       <div class="img">${opponent.image ? `<img src="${opponent.image}" alt="">` : ""}</div>
-      <div class="name">${escapeHtml(opponent.name)}</div>
-      <div class="stars">${"★".repeat(m.strength)}${"☆".repeat(5 - m.strength)}</div>
+      <div class="row-info">
+        <div class="name">${escapeHtml(opponent.name)}</div>
+        <div class="stars">${"★".repeat(m.strength)}${"☆".repeat(5 - m.strength)}</div>
+      </div>
+      <div class="score-dial" style="--pct:${m.strength * 20}%"><span>${m.strength}</span></div>
     </div>`;
       }
 
@@ -1115,7 +1457,7 @@
           <div class="img">${winner.image ? `<img src="${winner.image}" alt="">` : ""}</div>
           <div>${escapeHtml(winner.name)}</div>
         </div>
-        <div class="arrow">counters &rarr;</div>
+        <div class="arrow"><svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M11 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>counters</div>
         <div class="side" onclick="closeModal();openChampion('${loser.id}')">
           <div class="img">${loser.image ? `<img src="${loser.image}" alt="">` : ""}</div>
           <div>${escapeHtml(loser.name)}</div>
